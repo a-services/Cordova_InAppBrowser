@@ -1,0 +1,3 @@
+= Cordova InAppBrowser: Testing events
+
+See https://github.com/apache/cordova-plugin-inappbrowser
