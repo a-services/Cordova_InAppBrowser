@@ -1,3 +1,15 @@
 = Cordova InAppBrowser: Testing events
 
-See https://github.com/apache/cordova-plugin-inappbrowser
+- Opens test site
+
+- Performs auto-login +
+  `test : 123`
+
+- Substitutes links to PDF files with Google service +
+  https://gist.github.com/tzmartin/1cf85dc3d975f94cfddc04bc0dd399be
+
+
+Start screen defines several pages on test site that can be opened +
+https://github.com/apache/cordova-plugin-inappbrowser
+
+We can also edit InAppBrowser options used to create WebView.

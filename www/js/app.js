@@ -6,8 +6,6 @@ var browser;
 
 /**
  * Document ready.
- *
- * There are 3 buttons on the screen.
  */
 function onDocumentReady() {
     console.log('-- Document Ready');
@@ -63,6 +61,7 @@ function browserOpen(targetUrl) {
     browser.addEventListener('beforeload', onBeforeLoad);
     browser.addEventListener('loadstop',   onLoadStop);
     browser.addEventListener('loadstart',  onLoadStart);
+    browser.addEventListener('message',    onMessage);
     console.log('-- browserOpen listeners: beforeload,loadstop,loadstart');
 }
 
@@ -72,14 +71,23 @@ function browserOpen(targetUrl) {
  *   https://stackoverflow.com/questions/54061079/ionic-intercept-pdf-urls-with-cordova-plugin-inappbrowser
  */
 function onBeforeLoad(event, callback) {
-    console.log('-- onBeforeLoad:', event.url);
+    console.log('*** onBeforeLoad');
+    console.log('event.url:', event.url);
 
-    // If the URL being loaded is a PDF
-    if (event.url.match(".pdf")) {
-        // Open PDFs in system browser (instead of InAppBrowser)
+    var hijackPdf = false;
+
+    /* If the URL being loaded is a PDF
+     */
+    if (hijackPdf && event.url.match(".pdf")) {
+
+        /* Open PDFs in system browser (instead of InAppBrowser)
+         */
         cordova.InAppBrowser.open(event.url, "_system");
+
     } else {
-        // Invoke callback to load this URL in InAppBrowser
+
+        /* Invoke callback to load this URL in InAppBrowser
+         */
         callback(event.url);
     }
 }
@@ -99,10 +107,27 @@ function onLoadStop(event) {
             }
         `});
     }
+
+    /* We can replace PDF links with Google service if not already replaced
+     */
+    browser.executeScript({code: `
+        var lnx = document.getElementsByTagName("a");
+        console.log('--  lnx:',lnx.length);
+        for (var ln of lnx) {
+            if (ln.href.match(/[.]pdf/) && !ln.href.match(/docs[.]google[.]com/)) {
+                var enc = '${googlePrefix}${appHost}' + ln.href.substring(${appHost.length});
+                ln.href = enc;
+                console.log('--  enc:',enc);
+            }
+        }
+    `});
 }
 
 function onLoadStart(event) {
     console.log('-- onLoadStart:', event.url);
 }
 
+function onMessage(event) {
+    console.log('-- onMessage:', event);
+}
 
